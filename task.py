@@ -27,9 +27,11 @@ def inverted_bubble_sort(nums):  # сортировка для области г
 
 
 from math import sqrt
+from array import array
+import re
 
 
-def sr_val(nums):
+def val(nums):  # возвращает значения[cр. значение, мин, макс]
     summ = 0
     minn = 999
     maxx = -999
@@ -38,9 +40,6 @@ def sr_val(nums):
         minn = min(sqrt(i[0]**2 + i[1]**2), minn)
         maxx = max(sqrt(i[0]**2 + i[1]**2), maxx)
     return [summ / len(nums), minn, maxx]
-
-
-from array import array
 
 
 def get_sorted_array():
@@ -91,14 +90,12 @@ def get_sorted_array():
 
 # задание 2
 # 1 вариант решения через регулярку
-import re
-
-
 def regular_solution(find_for_auto_sign):
     result = []
+    regular_pattern = r'^[ABKMTXOАВЕКМНОРСТУХ]\d{3}[ABKMTXOАВЕКМНОРСТУХ]{2}\d{2,3}'
     for i in find_for_auto_sign:
-        result += re.findall(
-            r'^[ABKMTXOАВЕКМНОРСТУХ]\d{3}[ABKMTXOАВЕКМНОРСТУХ]{2}\d{2,3}', i)
+        result += re.findall(regular_pattern
+            , i)
     return result
 
 
@@ -131,7 +128,7 @@ def main():
     # задание 1
     output = get_sorted_array()
     print(output)
-    task = sr_val(output)
+    task = val(output)
     print("задание 1", end="\n")
     print("среднее значение до точек: ", round(task[0], 3))
     print("макс значение до точек: ", round(task[2], 3))
