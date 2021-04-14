@@ -1,14 +1,18 @@
+import re
+from math import sqrt
+
+# медленная сортировка, но для точек от 1 до 256 пойдеи вполне
 def bubble_sort(nums):
     swapped = True
     while swapped:
         swapped = False
-        for i in range(len(nums[1]) - 1):
-            if abs(nums[1][i][0]) > abs(nums[1][i + 1][0]):
-                nums[1][i], nums[1][i + 1] = nums[1][i + 1], nums[1][i]
+        for i in range(len(nums) - 1):
+            if abs(nums[i][0]) > abs(nums[i + 1][0]):
+                nums[i], nums[i + 1] = nums[i + 1], nums[i]
                 swapped = True
-            elif abs((nums[1][i][0])) == abs(nums[1][i + 1][0]):
-                if abs(nums[1][i][1]) > abs(nums[1][i + 1][1]):
-                    nums[1][i], nums[1][i + 1] = nums[1][i + 1], nums[1][i]
+            elif abs((nums[i][0])) == abs(nums[i + 1][0]):
+                if abs(nums[i][1]) > abs(nums[i + 1][1]):
+                    nums[i], nums[i + 1] = nums[i + 1], nums[i]
                     swapped = True
 
 
@@ -17,18 +21,13 @@ def inverted_bubble_sort(nums):  # сортировка для области г
     while swapped:
         swapped = False
         for i in range(len(nums[1]) - 1):
-            if abs(nums[1][i][0]) < abs(nums[1][i + 1][0]):
-                nums[1][i], nums[1][i + 1] = nums[1][i + 1], nums[1][i]
+            if abs(nums[i][0]) < abs(nums[i + 1][0]):
+                nums[i], nums[i + 1] = nums[i + 1], nums[i]
                 swapped = True
-            elif abs((nums[1][i][0])) == abs(nums[1][i + 1][0]):
-                if abs(nums[1][i][1]) > abs(nums[1][i + 1][1]):
-                    nums[1][i], nums[1][i + 1] = nums[1][i + 1], nums[1][i]
+            elif abs((nums[i][0])) == abs(nums[i + 1][0]):
+                if abs(nums[i][1]) > abs(nums[i + 1][1]):
+                    nums[i], nums[i + 1] = nums[i + 1], nums[i]
                     swapped = True
-
-
-from math import sqrt
-from array import array
-import re
 
 
 def val(nums):  # возвращает значения[cр. значение, мин, макс]
@@ -44,47 +43,34 @@ def val(nums):  # возвращает значения[cр. значение, �
 
 def get_sorted_array():
     # points - генерация точек в системе координат OxY points{1, 2, 3, 4} => области на прямой
-    points = ("i", [])
-    points1 = ("i", [])
-    points2 = ("i", [])
-    points3 = ("i", [])
-    points4 = ("i", [])
-    length = 5  # кол-во точек
+    points = []
+    length = 10  # кол-во точек
 
     for i in range(length):
-        points[1].append([])
+        points.append([])
     from random import randint
     for i in range(length):
-        points[1][i].append(randint(-100, 100))
-        points[1][i].append(randint(-100, 100))
+        points[i].append(randint(-100, 100))
+        points[i].append(randint(-100, 100))
 
-    p1 = p2 = p3 = p4 = 0
+    PO = [[], [], [], []]  # разделим на 4 части нашу область
+    p = [0, 0, 0, 0]
     for i in range(length):  # первая сортировка по областям
-        if (points[1][i][0] >= 0 and points[1][i][1] >= 0):
-            points1[1].append([])
-            points1[1][p1].append(points[1][i][0])
-            points1[1][p1].append(points[1][i][1])
-            p1 += 1
-        if (points[1][i][0] < 0 and points[1][i][1] >= 0):
-            points2[1].append([])
-            points2[1][p2].append(points[1][i][0])
-            points2[1][p2].append(points[1][i][1])
-            p2 += 1
-        if (points[1][i][0] < 0 and points[1][i][1] <= 0):
-            points3[1].append([])
-            points3[1][p3].append(points[1][i][0])
-            points3[1][p3].append(points[1][i][1])
-            p3 += 1
-        if (points[1][i][0] >= 0 and points[1][i][1] <= 0):
-            points4[1].append([])
-            points4[1][p4].append(points[1][i][0])
-            points4[1][p4].append(points[1][i][1])
-            p4 += 1
-        bubble_sort(points1)
-        bubble_sort(points2)
-        inverted_bubble_sort(points3)
-        bubble_sort(points4)
-        output_points = points1[1] + points2[1] + points3[1] + points4[1]
+        x = points[i][0]  # наш x
+        y = points[i][1]  # наш y
+        coordinates_part = ((x < 0) + (y < 0) + 2*(x >= 0)*(y < 0)) # в какой области находится наша очередная точка
+        PO[coordinates_part].append([])
+        PO[coordinates_part][p[coordinates_part]].append(x)
+        PO[coordinates_part][p[coordinates_part]].append(y)
+        p[coordinates_part] += 1
+    for i in PO:
+        if(i != PO[2] and i != []):
+            bubble_sort(i)
+    if(len(PO[2]) > 1):
+        print(PO[2])
+        inverted_bubble_sort(PO[2])
+
+    output_points = PO[0] + PO[1] + PO[2] + PO[3]
     return output_points
 
 
@@ -94,8 +80,7 @@ def regular_solution(find_for_auto_sign):
     result = []
     regular_pattern = r'^[ABKMTXOАВЕКМНОРСТУХ]\d{3}[ABKMTXOАВЕКМНОРСТУХ]{2}\d{2,3}'
     for i in find_for_auto_sign:
-        result += re.findall(regular_pattern
-            , i)
+        result += re.findall(regular_pattern, i)
     return result
 
 
@@ -109,16 +94,16 @@ def get_of_valid_sign(input_array):
                 1].isdigit() and input_sign[2].isdigit() and input_sign[
                     3].isdigit() and input_sign[4] in pattern and input_sign[
                         5] in pattern and input_sign[6].isdigit(
-                        ) and input_sign[7].isdigit()
+            ) and input_sign[7].isdigit()
             if pattern_matching:
                 output_array.append(input_sign)
         elif (len(input_sign) == 9):
             pattern_matching = input_sign[0] in pattern and input_sign[
                 1].isdigit() and input_sign[2].isdigit(
-                ) and input_sign[3].isdigit(
-                ) and input_sign[4] in pattern and input_sign[
+            ) and input_sign[3].isdigit(
+            ) and input_sign[4] in pattern and input_sign[
                     5] in pattern and input_sign[6].isdigit(
-                    ) and input_sign[7].isdigit() and input_sign[8].isdigit()
+            ) and input_sign[7].isdigit() and input_sign[8].isdigit()
             if pattern_matching:
                 output_array.append(input_sign)
     return output_array
@@ -134,7 +119,7 @@ def main():
     print("макс значение до точек: ", round(task[2], 3))
     print("минимальное значение до точек: ", round(task[1], 3))
     print("задание 2", end="\n")
-    #задание 2
+    # задание 2
     find_for_auto_sign = [
         "AASCB123KK12", "BB1234B1", "А123АА11", "А222АА123", "A12AA123",
         "A123CC1234", "AA123A12", "АА12322"
